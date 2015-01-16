@@ -18,6 +18,8 @@ SideOfMovement
 var headPosition = "";
 var bodyPosition = [];
 var tailPosition = "";
+var vMoves = [];
+var vSide = [];
 
 sideOfMovement = 0;
 
@@ -79,31 +81,32 @@ function printSnake()
 	}
 }
 
+//Controla que no se vaya por las paredes, o sea, pierde
+function controlWall(side)
+{
+
+}
+
 function moveSnake(side)
 {
 	switch(side)
 	{
 		case 1:
-			if(actualMove != prevMove)
+			vHeadPosition = headPosition.split('-');
+			headPosition = vHeadPosition[0].toString()+'-'+(parseInt(vHeadPosition[1]) + 1).toString();
+			for(var i = 0; i < bodyPosition.length; i++)
 			{
-				if()
+				vBodyPosition = bodyPosition[i].split('-');
+				bodyPosition[i] = vBodyPosition[0].toString()+'-'+(parseInt(vBodyPosition[1]) + 1).toString();
 			}
-			else
-			{
-				vHeadPosition = headPosition.split('-');
-				headPosition = vHeadPosition[0].toString()+'-'+(parseInt(vHeadPosition[1]) + 1).toString();
-				for(var i = 0; i < bodyPosition.length; i++)
-				{
-					vBodyPosition = bodyPosition[i].split('-');
-					bodyPosition[i] = vBodyPosition[0].toString()+'-'+(parseInt(vBodyPosition[1]) + 1).toString();
-				}
-				vTailPosition = tailPosition.split('-');
-				tailPosition = vTailPosition[0].toString()+'-'+(parseInt(vTailPosition[1]) + 1).toString();
-			}
+			vTailPosition = tailPosition.split('-');
+			tailPosition = vTailPosition[0].toString()+'-'+(parseInt(vTailPosition[1]) + 1).toString();
 			break;
 		case 2:
 			
-	}	
+			break;
+	}
+	
 }
 
 function newGame()
@@ -114,13 +117,14 @@ function newGame()
 	posBrick_x = 0;
 	posBrick_y = 0;
 	sideOfMovement = 1;
-	prevMove = 1;
-	actualMove = 1;
 	//LongBody cuenta la cabeza, el cuerpo y la cola
 	longBody = 4;
 	headPosition = "15-20";
 	bodyPosition = ["15-19","15-18"];
-	tailPosition = "15-17";
+	tailPosition = "15-17";	
+	prevMove = headPosition;
+	actualMove = headPosition;
+	timeOfTimer = 500;
 	
 	loadBrick();
 }
@@ -134,34 +138,50 @@ $(document).ready(function (){
 		printSnake();
 		moveSnake(sideOfMovement);
 		
-	},500,true);
+	},timeOfTimer,true);
 	
 	$('body').keydown(function() 
 	{
 		switch(event.which) {
 			//Flecha arriba
 			case 38:
-				sideOfMovement = 3;
-				prevMove = actualMove;
-				actualMove = sideOfMovement;
+				if(sideOfMovement != 4 && sideOfMovement != 3)
+				{					
+					sideOfMovement = 3;
+					currentMove = sideOfMovement;
+					vMoves.push(headPosition);
+					vSide.push(sideOfMovement);
+				}
 				break;
 			//Flecha izquierda
 			case 37:
-				sideOfMovement = 2;
-				prevMove = actualMove;
-				actualMove = sideOfMovement;
+				if(sideOfMovement != 1 && sideOfMovement != 2)
+				{
+					sideOfMovement = 2;
+					currentMove = sideOfMovement;
+					vMoves.push(headPosition);
+					vSide.push(sideOfMovement);
+				}
 				break;
 			//Flecha derecha
 			case 39:
-				sideOfMovement = 1;
-				prevMove = actualMove;
-				actualMove = sideOfMovement;
+				if(sideOfMovement != 1 && sideOfMovement != 2)
+				{
+					sideOfMovement = 1;
+					currentMove = sideOfMovement;
+					vMoves.push(headPosition);
+					vSide.push(sideOfMovement);
+				}
 				break;
 			//Flecha abajo
 			case 40:
-				sideOfMovement = 4;
-				prevMove = actualMove;
-				actualMove = sideOfMovement;
+				if(sideOfMovement != 4 && sideOfMovement != 3)
+				{
+					sideOfMovement = 4;
+					currentMove = sideOfMovement;
+					vMoves.push(headPosition);
+					vSide.push(sideOfMovement);
+				}
 				break;
 		}
 	});
