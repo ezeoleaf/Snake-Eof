@@ -34,11 +34,11 @@ function loadBrick()
 			//backgroundColor = getBackground(1 + Math.floor(Math.random() * 7)); //Descomentar este y comentar el de arriba para que cada brick sea de un color distinto sin importar el renglon
 			if(j == 1 && i == 1)
 			{
-				especificBrick = '<div class="brick" id="brick'+(i.toString())+'-'+(j.toString())+'" style="left: '+posBrick_x+'px; top: '+posBrick_y+'px;visibility: visible;" onmouseup="brickClick('+i+','+j+')"></div>';
+				especificBrick = '<div class="brick" id="brick'+(i.toString())+'-'+(j.toString())+'" style="left: '+posBrick_x+'px; top: '+posBrick_y+'px;visibility: visible;"></div>';
 			}
 			else
 			{
-				especificBrick = especificBrick + '<div class="brick" id="brick'+(i.toString())+'-'+(j.toString())+'" style="left: '+posBrick_x+'px; top: '+posBrick_y+'px;visibility: visible;" onmouseup="brickClick('+i+','+j+')"></div>';
+				especificBrick = especificBrick + '<div class="brick" id="brick'+(i.toString())+'-'+(j.toString())+'" style="left: '+posBrick_x+'px; top: '+posBrick_y+'px;visibility: visible;"></div>';
 			}
 			posBrick_x += 17;
 		}
