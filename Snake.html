@@ -1,0 +1,189 @@
+<!DOCTYPE html> 
+<html lang="es"> 
+<head> 
+	<title>Snake</title>
+	<script type='text/javascript' src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="jquery.timer.js" type="text/javascript"></script>
+	<link href="SnakeStyle.css" rel="stylesheet" type="text/css" />
+</head>
+<script>
+/*
+SideOfMovement
+1 - Derecha
+2 - Izquierda
+3 - Arriba
+4 - Abajo
+*/
+
+var headPosition = "";
+var bodyPosition = [];
+var tailPosition = "";
+
+sideOfMovement = 0;
+
+function loadBrick()
+{
+	var especificBrick;
+	
+	for ( var i = 1; i <= cantBrickH; i++ ) 
+	{
+		for ( var j = 1; j <= cantBrickV; j++)
+		{
+			//backgroundColor = getBackground(1 + Math.floor(Math.random() * 7)); //Descomentar este y comentar el de arriba para que cada brick sea de un color distinto sin importar el renglon
+			if(j == 1 && i == 1)
+			{
+				especificBrick = '<div class="brick" id="brick'+(i.toString())+'-'+(j.toString())+'" style="left: '+posBrick_x+'px; top: '+posBrick_y+'px;visibility: visible;" onmouseup="brickClick('+i+','+j+')"></div>';
+			}
+			else
+			{
+				especificBrick = especificBrick + '<div class="brick" id="brick'+(i.toString())+'-'+(j.toString())+'" style="left: '+posBrick_x+'px; top: '+posBrick_y+'px;visibility: visible;" onmouseup="brickClick('+i+','+j+')"></div>';
+			}
+			posBrick_x += 17;
+		}
+		posBrick_x = 0;
+		posBrick_y += 17;
+	}
+	$('#court').html(especificBrick);
+}
+
+function printSnake()
+{
+	for ( var i = 1; i <= cantBrickH; i++ ) 
+	{
+		for ( var j = 1; j <= cantBrickV; j++)
+		{
+			nameIAndJ = i.toString()+'-'+j.toString();
+			if(nameIAndJ == headPosition)
+			{
+				$('#brick'+nameIAndJ).css('background','#00000F');
+			}
+			else
+			{
+				if($.inArray(nameIAndJ, bodyPosition) != -1)
+				{
+					$('#brick'+nameIAndJ).css('background','#000000');
+				}
+				else
+				{
+					if(nameIAndJ == tailPosition)
+					{
+						$('#brick'+nameIAndJ).css('background','#000009');
+					}
+					else
+					{
+						$('#brick'+nameIAndJ).css('background','#cccccc');
+					}
+				}
+			}
+		}
+	}
+}
+
+function moveSnake(side)
+{
+	switch(side)
+	{
+		case 1:
+			if(actualMove != prevMove)
+			{
+				if()
+			}
+			else
+			{
+				vHeadPosition = headPosition.split('-');
+				headPosition = vHeadPosition[0].toString()+'-'+(parseInt(vHeadPosition[1]) + 1).toString();
+				for(var i = 0; i < bodyPosition.length; i++)
+				{
+					vBodyPosition = bodyPosition[i].split('-');
+					bodyPosition[i] = vBodyPosition[0].toString()+'-'+(parseInt(vBodyPosition[1]) + 1).toString();
+				}
+				vTailPosition = tailPosition.split('-');
+				tailPosition = vTailPosition[0].toString()+'-'+(parseInt(vTailPosition[1]) + 1).toString();
+			}
+			break;
+		case 2:
+			
+	}	
+}
+
+function newGame()
+{
+	sep = "/--/";
+	cantBrickH = 30;
+	cantBrickV = 40;
+	posBrick_x = 0;
+	posBrick_y = 0;
+	sideOfMovement = 1;
+	prevMove = 1;
+	actualMove = 1;
+	//LongBody cuenta la cabeza, el cuerpo y la cola
+	longBody = 4;
+	headPosition = "15-20";
+	bodyPosition = ["15-19","15-18"];
+	tailPosition = "15-17";
+	
+	loadBrick();
+}
+
+$(document).ready(function (){
+
+	newGame();
+	
+	var timer = $.timer(function (){
+		
+		printSnake();
+		moveSnake(sideOfMovement);
+		
+	},500,true);
+	
+	$('body').keydown(function() 
+	{
+		switch(event.which) {
+			//Flecha arriba
+			case 38:
+				sideOfMovement = 3;
+				prevMove = actualMove;
+				actualMove = sideOfMovement;
+				break;
+			//Flecha izquierda
+			case 37:
+				sideOfMovement = 2;
+				prevMove = actualMove;
+				actualMove = sideOfMovement;
+				break;
+			//Flecha derecha
+			case 39:
+				sideOfMovement = 1;
+				prevMove = actualMove;
+				actualMove = sideOfMovement;
+				break;
+			//Flecha abajo
+			case 40:
+				sideOfMovement = 4;
+				prevMove = actualMove;
+				actualMove = sideOfMovement;
+				break;
+		}
+	});
+});
+</script>
+<body>
+	<div id="headCourt">
+		<div id="player">
+			<span id="playerText"></span>
+			<br />
+			<span id="playerLife"></span>
+		</div>
+		<div id="reset">
+			<input type="button" id="buttonReset" name="reset" value="Reset"/>
+		</div>
+		<div id="computer">
+			<span id="computerText" align="center"></span>
+			<br />
+			<span id="computerLife"></span>
+		</div>
+	</div>
+	<div id="court">		
+	</div>	
+</body> 
+</html>
