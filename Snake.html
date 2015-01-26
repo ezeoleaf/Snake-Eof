@@ -18,8 +18,19 @@ SideOfMovement
 var headPosition = "";
 var bodyPosition = [];
 var tailPosition = "";
-var vMoves = [];
-var vSide = [];
+
+var vPlaceTurn = [];
+var vDirectionPlaceTurn = [];
+var vCantPass = [];
+var vHeadTurn = [];
+var vBodyTurn = [];
+var vTailTurn = [];
+var vHeadDirectionPlaceTurn = [];
+var vHeadCantPass = [];
+var vBodyDirectionPlaceTurn = [];
+var vBodyCantPass = [];
+var vTailDirectionPlaceTurn = [];
+var vTailCantPass = [];
 
 sideOfMovement = 0;
 
@@ -87,26 +98,188 @@ function controlWall(side)
 
 }
 
-function moveSnake(side)
+//Agrega speed segun el side
+function addSpeed(sideToMove,positionToAddSpeed)
+{
+	
+	switch(sideToMove)
+	{
+		case 1:
+			positionToReturn = positionToAddSpeed[0].toString()+'-'+(parseInt(positionToAddSpeed[1]) + 1).toString();
+			break;
+		case 2:
+			positionToReturn = positionToAddSpeed[0].toString()+'-'+(parseInt(positionToAddSpeed[1]) - 1).toString();
+			break;
+		case 3:
+			positionToReturn = (parseInt(positionToAddSpeed[0]) - 1).toString()+'-'+positionToAddSpeed[1].toString();
+			break;
+		case 4:
+			positionToReturn = (parseInt(positionToAddSpeed[0]) + 1).toString()+'-'+positionToAddSpeed[1].toString();
+			break;
+	}
+	return positionToReturn;
+}
+
+function getSpeed(side)
 {
 	switch(side)
 	{
 		case 1:
-			vHeadPosition = headPosition.split('-');
-			headPosition = vHeadPosition[0].toString()+'-'+(parseInt(vHeadPosition[1]) + 1).toString();
-			for(var i = 0; i < bodyPosition.length; i++)
-			{
-				vBodyPosition = bodyPosition[i].split('-');
-				bodyPosition[i] = vBodyPosition[0].toString()+'-'+(parseInt(vBodyPosition[1]) + 1).toString();
-			}
-			vTailPosition = tailPosition.split('-');
-			tailPosition = vTailPosition[0].toString()+'-'+(parseInt(vTailPosition[1]) + 1).toString();
+			returnSpeed = "0/--/+1";
 			break;
 		case 2:
-			
+			returnSpeed = "0/--/-1";
+			break;
+		case 3:
+			returnSpeed = "-1/--/0";
+			break;
+		case 4:
+			returnSpeed = "+1/--/0";
 			break;
 	}
+	return returnSpeed;
+}
+
+function sumSpeed(position,speed)
+{
+	vPosition = position.split('-');
+	vSpeed = speed.split('/--/');
 	
+	position_0 = parseInt(vPosition[0]) + parseInt(vSpeed[0]);
+	position_1 = parseInt(vPosition[1]) + parseInt(vSpeed[1]);
+	
+	return (position_0.toString()+'-'+position_1.toString());
+}
+
+function moveSnake(side)
+{
+	var sumHead = "";
+	var sumBody = [];
+	var sumTail = "";
+	moveHead = 0;
+	moveBody = 0;
+	moveTail = 0;
+	if(vPlaceTurn.length == 0)
+	{
+		sumHead = getSpeed(side);
+		for(var i = 0; i < bodyPosition.length; i++)
+		{
+			sumBody[i] = getSpeed(side);
+		}
+		sumTail = getSpeed(side)
+	}
+	else
+	{
+		headPositionT = headPosition;
+		longPlaceTurn = vPlaceTurn.length;
+		for(var i = 0; i < longPlaceTurn; i++)
+		{
+			element = 0;
+			countOfElements = vCantPass[i];
+			
+			if(moveHead == 0)
+			{
+				element++;
+				vHeadPosition = headPosition.split('-');
+				if(headPosition == vPlaceTurn[i])
+				{
+					sumHead = getSpeed(side);
+					countOfElements++;
+					moveHead = 1;
+				}
+				else
+				{
+					if(countOfElements >= element)
+					{
+						if(i == (longPlaceTurn - 1))
+						{
+							sumHead = getSpeed(side);
+							moveHead = 1;
+						}
+					}
+					else
+					{
+						sumHead = getSpeed(vDirectionPlaceTurn[i]);
+						moveHead = 1;
+					}
+				}
+			}
+			
+			if(moveBody == 0)
+			{
+				for(var j = 0; j < bodyPosition.length; j++)
+				{
+					element++;
+					vBodyPosition = bodyPosition[j].split('-');
+					if(bodyPosition[j] == vPlaceTurn[i])
+					{
+						sumBody[j] = getSpeed(side);
+						countOfElements++;
+						moveBody = 1;
+					}
+					else
+					{
+						if(countOfElements >= element)
+						{
+							if(i == (longPlaceTurn - 1))
+							{
+								sumBody[j] = getSpeed(side);
+								moveBody = 1;
+							}
+						}
+						else
+						{
+							sumBody[j] = getSpeed(vDirectionPlaceTurn[i]);
+							moveBody = 1;
+						}
+					}
+					//countOfElements = vCantPass[i];
+				}
+			}
+			
+			if(moveTail == 0)
+			{
+				element++;
+				vTailPosition = tailPosition.split('-');
+				if(tailPosition == vPlaceTurn[i])
+				{
+					sumTail = getSpeed(side);
+					countOfElements++;
+					moveTail = 1;
+					vPlaceTurn.splice(i,1);
+					vDirectionPlaceTurn.splice(i,1);
+					vCantPass.splice(i,1);
+					i--;
+					longPlaceTurn = vPlaceTurn.length;
+				}
+				else
+				{
+					if(countOfElements >= element)
+					{
+						if(i == (longPlaceTurn - 1))
+						{
+							sumTail = getSpeed(side);
+							moveTail = 1;
+						}
+					}
+					else
+					{
+						sumTail = getSpeed(vDirectionPlaceTurn[i]);
+						moveTail = 1;
+					}
+				}
+				vCantPass[i] = countOfElements;
+			}
+		}
+	}
+	
+	
+	headPosition = sumSpeed(headPosition,sumHead);
+	for(var i = 0; i < bodyPosition.length; i++)
+	{
+		bodyPosition[i] = sumSpeed(bodyPosition[i],sumBody[i]);
+	}
+	tailPosition = sumSpeed(tailPosition,sumTail);
 }
 
 function newGame()
@@ -122,8 +295,6 @@ function newGame()
 	headPosition = "15-20";
 	bodyPosition = ["15-19","15-18"];
 	tailPosition = "15-17";	
-	prevMove = headPosition;
-	actualMove = headPosition;
 	timeOfTimer = 500;
 	
 	loadBrick();
@@ -146,41 +317,41 @@ $(document).ready(function (){
 			//Flecha arriba
 			case 38:
 				if(sideOfMovement != 4 && sideOfMovement != 3)
-				{					
+				{	
+					vPlaceTurn.push(headPosition);
+					vDirectionPlaceTurn.push(sideOfMovement);
+					vCantPass.push(0);
 					sideOfMovement = 3;
-					currentMove = sideOfMovement;
-					vMoves.push(headPosition);
-					vSide.push(sideOfMovement);
 				}
 				break;
 			//Flecha izquierda
 			case 37:
 				if(sideOfMovement != 1 && sideOfMovement != 2)
 				{
+					vPlaceTurn.push(headPosition);
+					vDirectionPlaceTurn.push(sideOfMovement);
+					vCantPass.push(0);
 					sideOfMovement = 2;
-					currentMove = sideOfMovement;
-					vMoves.push(headPosition);
-					vSide.push(sideOfMovement);
 				}
 				break;
 			//Flecha derecha
 			case 39:
 				if(sideOfMovement != 1 && sideOfMovement != 2)
 				{
+					vPlaceTurn.push(headPosition);
+					vDirectionPlaceTurn.push(sideOfMovement);
+					vCantPass.push(0);
 					sideOfMovement = 1;
-					currentMove = sideOfMovement;
-					vMoves.push(headPosition);
-					vSide.push(sideOfMovement);
 				}
 				break;
 			//Flecha abajo
 			case 40:
 				if(sideOfMovement != 4 && sideOfMovement != 3)
 				{
+					vPlaceTurn.push(headPosition);
+					vDirectionPlaceTurn.push(sideOfMovement);
+					vCantPass.push(0);
 					sideOfMovement = 4;
-					currentMove = sideOfMovement;
-					vMoves.push(headPosition);
-					vSide.push(sideOfMovement);
 				}
 				break;
 		}
