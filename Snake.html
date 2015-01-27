@@ -136,14 +136,26 @@ function getSpeed(side)
 		case 4:
 			returnSpeed = "+1/--/0";
 			break;
+		case 0:
+			returnSpeed = "0/--/0";
+			break;
 	}
 	return returnSpeed;
 }
 
-function sumSpeed(position,speed)
+function sumSpeed(position,speed,control)
 {
 	vPosition = position.split('-');
-	vSpeed = speed.split('/--/');
+	try
+	{
+		vSpeed = speed.split('/--/');
+	}
+	catch (err)
+	{
+		pos = position;
+		spd = speed;
+	}
+	
 	
 	position_0 = parseInt(vPosition[0]) + parseInt(vSpeed[0]);
 	position_1 = parseInt(vPosition[1]) + parseInt(vSpeed[1]);
@@ -157,8 +169,11 @@ function moveSnake(side)
 	var sumBody = [];
 	var sumTail = "";
 	moveHead = 0;
-	moveBody = 0;
+	//moveBody = 0;
 	moveTail = 0;
+	bodyElement = 0;
+	var moveBody = [];
+	
 	if(vPlaceTurn.length == 0)
 	{
 		sumHead = getSpeed(side);
@@ -170,7 +185,7 @@ function moveSnake(side)
 	}
 	else
 	{
-		headPositionT = headPosition;
+		
 		longPlaceTurn = vPlaceTurn.length;
 		for(var i = 0; i < longPlaceTurn; i++)
 		{
@@ -180,7 +195,6 @@ function moveSnake(side)
 			if(moveHead == 0)
 			{
 				element++;
-				vHeadPosition = headPosition.split('-');
 				if(headPosition == vPlaceTurn[i])
 				{
 					sumHead = getSpeed(side);
@@ -189,97 +203,129 @@ function moveSnake(side)
 				}
 				else
 				{
-					if(countOfElements >= element)
-					{
-						if(i == (longPlaceTurn - 1))
+					if($.inArray(headPosition,vPlaceTurn) == -1){
+						if(countOfElements >= element)
 						{
-							sumHead = getSpeed(side);
-							moveHead = 1;
+							if(i == (longPlaceTurn - 1))
+							{
+								sumHead = getSpeed(side);
+								
+							}
+							else
+							{
+								sumHead = getSpeed(vDirectionPlaceTurn[i + 1]);
+							}
 						}
-					}
-					else
-					{
-						sumHead = getSpeed(vDirectionPlaceTurn[i]);
+						else
+						{
+							sumHead = getSpeed(vDirectionPlaceTurn[i]);
+						}
 						moveHead = 1;
 					}
 				}
 			}
 			
-			if(moveBody == 0)
+			if(moveBody.length != bodyPosition.length)
 			{
 				for(var j = 0; j < bodyPosition.length; j++)
 				{
+				
 					element++;
-					vBodyPosition = bodyPosition[j].split('-');
-					if(bodyPosition[j] == vPlaceTurn[i])
+					if($.inArray(j,moveBody) == -1)
 					{
-						sumBody[j] = getSpeed(side);
-						countOfElements++;
-						moveBody = 1;
-					}
-					else
-					{
-						if(countOfElements >= element)
+						
+						if(bodyPosition[j] == vPlaceTurn[i])
 						{
 							if(i == (longPlaceTurn - 1))
 							{
 								sumBody[j] = getSpeed(side);
-								moveBody = 1;
 							}
+							else
+							{
+								sumBody[j] = getSpeed(vDirectionPlaceTurn[i + 1]);
+							}
+							countOfElements++;
+							moveBody.push(j);
 						}
 						else
 						{
-							sumBody[j] = getSpeed(vDirectionPlaceTurn[i]);
-							moveBody = 1;
+							if($.inArray(bodyPosition[j],vPlaceTurn) == -1){
+								if(countOfElements >= element)
+								{
+									if(i == (longPlaceTurn - 1))
+									{
+										sumBody[j] = getSpeed(side);
+									}
+									else
+									{
+										sumBody[j] = getSpeed(vDirectionPlaceTurn[i + 1]);
+									}
+								}
+								else
+								{
+									sumBody[j] = getSpeed(vDirectionPlaceTurn[i]);
+								}
+								moveBody.push(j);
+							}
 						}
 					}
-					//countOfElements = vCantPass[i];
 				}
 			}
 			
 			if(moveTail == 0)
 			{
 				element++;
-				vTailPosition = tailPosition.split('-');
 				if(tailPosition == vPlaceTurn[i])
 				{
-					sumTail = getSpeed(side);
+					if(i == (longPlaceTurn - 1))
+					{
+						sumTail = getSpeed(side);
+					}
+					else
+					{
+						sumTail = getSpeed(vDirectionPlaceTurn[i + 1]);
+					}
 					countOfElements++;
 					moveTail = 1;
-					vPlaceTurn.splice(i,1);
-					vDirectionPlaceTurn.splice(i,1);
-					vCantPass.splice(i,1);
+					vPlaceTurn.splice(0,1);
+					vDirectionPlaceTurn.splice(0,1);
+					vCantPass.splice(0,1);
 					i--;
 					longPlaceTurn = vPlaceTurn.length;
 				}
 				else
 				{
-					if(countOfElements >= element)
-					{
-						if(i == (longPlaceTurn - 1))
+					if($.inArray(tailPosition,vPlaceTurn) == -1){
+						if(countOfElements >= element)
 						{
-							sumTail = getSpeed(side);
-							moveTail = 1;
+							if(i == (longPlaceTurn - 1))
+							{
+								sumTail = getSpeed(side);
+							}
+							else
+							{
+								sumTail = getSpeed(vDirectionPlaceTurn[i+1]);
+							}
 						}
-					}
-					else
-					{
-						sumTail = getSpeed(vDirectionPlaceTurn[i]);
+						else
+						{
+							sumTail = getSpeed(vDirectionPlaceTurn[i]);
+						}
 						moveTail = 1;
 					}
 				}
-				vCantPass[i] = countOfElements;
 			}
+			vCantPass[i] = countOfElements;
 		}
 	}
 	
 	
-	headPosition = sumSpeed(headPosition,sumHead);
+	headPosition = sumSpeed(headPosition,sumHead,1);
 	for(var i = 0; i < bodyPosition.length; i++)
 	{
-		bodyPosition[i] = sumSpeed(bodyPosition[i],sumBody[i]);
+		bodyPosition[i] = sumSpeed(bodyPosition[i],sumBody[i],2);
 	}
-	tailPosition = sumSpeed(tailPosition,sumTail);
+	tailPosition = sumSpeed(tailPosition,sumTail,3);
 }
 
 function newGame()
@@ -306,8 +352,8 @@ $(document).ready(function (){
 	
 	var timer = $.timer(function (){
 		
-		printSnake();
 		moveSnake(sideOfMovement);
+		printSnake();
 		
 	},timeOfTimer,true);
 	
